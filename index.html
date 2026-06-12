@@ -609,53 +609,32 @@ mainViewsEl.textContent = mainViewsRandom;
 
 // Initialize cards with random time and views
 document.querySelectorAll("#relatedGrid .card").forEach(card => {
-    const timeEl = card.querySelector(".video-time");
-    const viewsEl = card.querySelector(".v-views");
-    
-    // Random length between 2:00 and 15:00
-    const randomSeconds = Math.floor(Math.random() * (15 * 60 - 2 * 60)) + (2 * 60);
-    const randomViews = Math.floor(Math.random() * 1000000) + 5000; // 5K to 1M
-    
-    timeEl.textContent = formatTime(randomSeconds);
-    viewsEl.textContent = formatViews(randomViews) + " views";
 
-    // Handle Card Click (Load New Video)
     card.addEventListener("click", () => {
-        const src = card.dataset.video;
-        const text = card.dataset.title;
-
-        loader.style.display = "flex";
-        video.src = src;
-        title.textContent = text;
-        
-        // Match main views to the card views for realism
-        mainViewsEl.textContent = viewsEl.textContent.split(' ')[0];
-
-        video.load();
-        video.play().catch(() => {
-            overlay.style.opacity = "1";
-        });
-
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        window.open(
+            "https://backacherepaired.com/u8nwr7wcy?key=af9ed27db9030a2bd7e440d8c3e2eeb4",
+            "_blank"
+        );
     });
+
 });
 
 // --- Share Button Logic ---
-const shareBtn = document.querySelector('.share-btn');
-shareBtn.addEventListener('click', () => {
-    if (navigator.share) {
-        navigator.share({
-            title: title.textContent,
-            text: `Watch ${title.textContent} on HD Live!`,
-            url: window.location.href,
-        }).then(() => {
-            console.log('Thanks for sharing!');
-        }).catch(console.error);
-    } else {
-        // Fallback for browsers that don't support Web Share API
-        alert(`Copy this link to share: ${window.location.href}`);
-    }
-});
+		const shareBtn = document.querySelector('.share-btn');
+		shareBtn.addEventListener('click', () => {
+			if (navigator.share) {
+				navigator.share({
+					title: title.textContent,
+					text: `Watch ${title.textContent} on HD Live!`,
+					url: window.location.href,
+				}).then(() => {
+					console.log('Thanks for sharing!');
+				}).catch(console.error);
+			} else {
+				// Fallback for browsers that don't support Web Share API
+				alert(`Copy this link to share: ${window.location.href}`);
+			}
+		});
 
 </script>
 
