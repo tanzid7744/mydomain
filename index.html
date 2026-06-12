@@ -1,1 +1,674 @@
-<h1>test</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HD Live - Premium Video Streaming</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+/* CSS Variables for theme consistency */
+:root {
+    --bg-color: #0d0d0f; /* Darker grey, modern feel */
+    --card-bg: #1a1a1c;
+    --player-bg: #000000;
+    --primary-color: #ff0000; /* Red, reminiscent of YouTube/Netflix */
+    --text-main: #eeeeee;
+    --text-muted: #aaaaaa;
+    --text-live: #ffffff;
+    --btn-hover: #cc0000;
+}
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--bg-color);
+    color: var(--text-main);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Header & Navigation Styles */
+.header {
+    background: rgba(13, 13, 15, 0.95);
+    backdrop-filter: blur(5px);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.header-container {
+    width: 95%;
+    max-width: 1500px;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--text-main);
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: -1px;
+}
+
+.logo span {
+    color: var(--primary-color);
+    position: relative;
+    padding-left: 5px;
+}
+/* Live indicator dot */
+.logo span::after {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background-color: var(--primary-color);
+    border-radius: 50%;
+    margin-left: 5px;
+    vertical-align: middle;
+    animation: pulse 1.5s infinite;
+}
+
+.nav-menu {
+    display: flex;
+    gap: 30px;
+}
+
+.nav-menu a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 600;
+    transition: color 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.nav-menu a:hover, .nav-menu a.active {
+    color: var(--text-main);
+}
+
+/* Main Container */
+.container {
+    width: 95%;
+    max-width: 1500px;
+    margin: auto;
+    padding: 25px 0;
+}
+
+/* Player Section */
+.player-section {
+    background: var(--player-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+    margin-bottom: 30px;
+}
+
+.video-wrapper {
+    position: relative;
+    background: #000;
+    cursor: pointer;
+    /* Fixed: aspect-ratio on wrapper to ensure correct dimensions for overlay */
+    aspect-ratio: 16/9;
+    width: 100%;
+}
+
+video {
+    width: 100%;
+    height: 100%; /* Take full height of wrapper */
+    display: block;
+    object-fit: contain; /* Ensure video is fully visible */
+}
+
+/* Common Play Button Style */
+.play-btn-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    color: white;
+    font-size: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* FIX: Centering the big play button using Flexbox on parent */
+.overlay-common {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center; /* Center vertically */
+    justify-content: center; /* Center horizontally */
+    z-index: 10;
+    /* Optional: reduce darkness if button is always there */
+    background: rgba(0, 0, 0, 0.4);
+    transition: opacity 0.3s, background 0.3s;
+}
+
+.video-wrapper:hover .overlay-common .play-btn-circle {
+    transform: scale(1.1);
+    background: rgba(255, 0, 0, 0.9);
+    border-color: transparent;
+}
+
+.loader {
+    position: absolute;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-top: 4px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(255, 0, 0, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); }
+}
+
+/* Info & Buttons Section */
+.info {
+    padding: 25px 30px;
+    background-color: var(--card-bg);
+}
+
+.info h1 {
+    font-size: 32px;
+    margin-bottom: 5px;
+    font-weight: 700;
+}
+
+.main-video-metadata {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 15px;
+}
+
+.main-video-metadata span i {
+    color: var(--primary-color);
+    margin-right: 5px;
+}
+
+.player-controls-area {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 20px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.btn {
+    padding: 12px 24px;
+    font-size: 15px;
+    font-weight: 700;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn i { font-size: 16px; }
+
+.btn-primary {
+    background: var(--primary-color);
+    color: var(--text-live);
+}
+
+.btn-primary:hover {
+    background: var(--btn-hover);
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-main);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.share-btn {
+    font-size: 20px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.2s;
+    padding: 10px;
+}
+
+.share-btn:hover {
+    color: var(--text-main);
+}
+
+/* Related Videos Grid */
+.related-header {
+    margin: 40px 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.related-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+}
+
+.card {
+    background: var(--card-bg);
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: 0.3s;
+    border: 1px solid transparent;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+}
+
+.thumb-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+.card img {
+    width: 100%;
+    aspect-ratio: 16/9;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s;
+}
+
+.card:hover img {
+    transform: scale(1.05);
+}
+
+/* FIX: Related Card Play Button ALWAYS VISIBLE style */
+.card-play-overlay {
+    background: rgba(0, 0, 0, 0.2); /* Slightly lighter overall overlay */
+    opacity: 1; /* Fixed: Always visible now */
+}
+
+/* Highlight overlay on hover for card */
+.card:hover .card-play-overlay {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.card .play-btn-circle {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+    background: rgba(0, 0, 0, 0.7); /* Darker background for visibility */
+    border: 2px solid white;
+}
+
+.card:hover .play-btn-circle {
+    transform: scale(1.1);
+    background: var(--primary-color);
+    border-color: transparent;
+}
+
+/* Video stats badge on card (Time, Views) */
+.video-stats {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 5;
+}
+
+.card-content {
+    padding: 15px;
+}
+
+.card-title {
+    font-size: 15px;
+    line-height: 1.4;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: var(--text-main);
+    /* Multi-line ellipsis */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.card-metadata {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+/* Media Queries */
+@media (max-width: 1024px) {
+    .info h1 { font-size: 26px; }
+}
+
+@media (max-width: 768px) {
+    .nav-menu { gap: 15px; }
+    .nav-menu a { font-size: 13px; }
+    .logo { font-size: 24px; }
+    .container { padding: 15px 0; }
+    .info { padding: 20px; }
+    .info h1 { font-size: 22px; }
+    .player-controls-area { flex-direction: column; gap: 20px; align-items: flex-start; }
+    .play-btn-circle { width: 60px; height: 60px; font-size: 24px; }
+}
+
+@media (max-width: 480px) {
+    .related-grid { grid-template-columns: 1fr; }
+    .header-container { flex-direction: column; gap: 10px; padding: 10px 0; }
+    .nav-menu { gap: 20px; }
+    .info h1 { font-size: 18px; }
+    .main-video-metadata { flex-direction: column; gap: 5px; }
+    .action-buttons { flex-direction: column; width: 100%; }
+    .btn { width: 100%; justify-content: center; }
+    .share-btn-wrapper { width: 100%; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+    <div class="header-container">
+        <div class="logo">HD <span>Live</span></div>
+        <nav class="nav-menu">
+            <a href="https://backacherepaired.com/u8nwr7wcy?key=af9ed27db9030a2bd7e440d8c3e2eeb4" target="_blank"  class="active">All Category</a>
+            <a href="https://backacherepaired.com/u8nwr7wcy?key=af9ed27db9030a2bd7e440d8c3e2eeb4" target="_blank" >Best Porn</a>
+            <a href="https://backacherepaired.com/u8nwr7wcy?key=af9ed27db9030a2bd7e440d8c3e2eeb4" target="_blank" >Live Cam</a>
+        </nav>
+    </div>
+</header>
+
+<div class="container">
+
+    <div class="player-section">
+        <div class="video-wrapper" id="mainVideoWrapper">
+            <video id="player" controls preload="metadata" src="video.mp4"></video>
+
+            <div class="loader" id="loader">
+                <div class="spinner"></div>
+            </div>
+
+            <div class="play-overlay overlay-common" id="playOverlay">
+                <div class="play-btn-circle"><i class="fas fa-play"></i></div>
+            </div>
+        </div>
+
+        <div class="info">
+            <h1 id="mainTitle">New Viral Mms 2026, Latest Leaked Video</h1>
+            
+            <div class="main-video-metadata">
+                <span><i class="fas fa-eye"></i> <span id="mainViews">1.2M</span> views</span>
+                <span><i class="fas fa-clock"></i> Updated 2 days ago</span>
+            </div>
+            
+            <div class="player-controls-area">
+				<div class="action-buttons">
+					<a href="https://backacherepaired.com/u8nwr7wcy?key=af9ed27db9030a2bd7e440d8c3e2eeb4" target="_blank"  class="btn btn-primary">
+						<i class="fas fa-stream"></i> Watch Now
+					</a>
+
+					<a href="https://backacherepaired.com/u8nwr7wcy?key=af9ed27db9030a2bd7e440d8c3e2eeb4" target="_blank"  class="btn btn-secondary" download>
+						<i class="fas fa-download"></i> Download
+					</a>
+				</div>
+				<div class="share-btn-wrapper">
+					<a href="https://backacherepaired.com/u8nwr7wcy?key=af9ed27db9030a2bd7e440d8c3e2eeb4" target="_blank"  class="share-btn" title="View Ads">
+						<i class="fas fa-share-alt"></i>
+					</a>
+				</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="related-header">
+        <h2 class="related-title">Recommended For You</h2>
+    </div>
+
+    <div class="related-grid" id="relatedGrid">
+        <div class="card" data-video="https://backacherepaired.com/u8nwr7wcy?key=af9ed27db9030a2bd7e440d8c3e2eeb4" data-title="Amazing Nature - Deep Forest Escape" data-id="1">
+            <div class="thumb-wrapper">
+                <img src="thumb1.jpg" alt="Amazing Nature">
+                <span class="video-stats video-time">05:12</span>
+                <div class="card-play-overlay overlay-common">
+                    <div class="play-btn-circle"><i class="fas fa-play"></i></div>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="card-title">Alia Bhatt Viral MMS Video - Real Leaked Full Scene</div>
+                <div class="card-metadata">
+                    <span class="v-views">1.2M views</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" data-video="https://backacherepaired.com/u8nwr7wcy?key=af9ed27db9030a2bd7e440d8c3e2eeb4" data-title="Urban Exploration: Hidden Cities documented" data-id="2">
+            <div class="thumb-wrapper">
+                <img src="thumb2.jpg" alt="Travel Documentary">
+                <span class="video-stats video-time">12:08</span>
+                <div class="card-play-overlay overlay-common">
+                    <div class="play-btn-circle"><i class="fas fa-play"></i></div>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="card-title">Saree Aunty Sex Video - Bahut Hot Leaked Footage</div>
+                <div class="card-metadata">
+                    <span class="v-views">850K views</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" data-video="https://backacherepaired.com/u8nwr7wcy?key=af9ed27db9030a2bd7e440d8c3e2eeb4" data-title="The Future of AI: 2024 In-Depth Review" data-id="3">
+            <div class="thumb-wrapper">
+                <img src="thumb3.jpg" alt="Technology Review">
+                <span class="video-stats video-time">08:45</span>
+                <div class="card-play-overlay overlay-common">
+                    <div class="play-btn-circle"><i class="fas fa-play"></i></div>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="card-title">Desi Maid Ko Malik Ne Choda - Full Viral Video</div>
+                <div class="card-metadata">
+                    <span class="v-views">3.1M views</span>
+                </div>
+            </div>
+        </div>
+
+		<div class="card" data-video="https://backacherepaired.com/u8nwr7wcy?key=af9ed27db9030a2bd7e440d8c3e2eeb4" data-title="Epic Sports Moments: Last Second Goals" data-id="4">
+			<div class="thumb-wrapper">
+				<img src="thumb4.jpg" alt="Sports Highlights"> <span class="video-stats video-time">03:55</span>
+				<div class="card-play-overlay overlay-common">
+					<div class="play-btn-circle"><i class="fas fa-play"></i></div>
+				</div>
+			</div>
+			<div class="card-content">
+				<div class="card-title">Pakistani Girl Viral Sex Tape - Full Uncensored</div>
+				<div class="card-metadata">
+					<span class="v-views">500K views</span>
+				</div>
+			</div>
+		</div>
+    </div>
+
+</div>
+
+<script>
+// --- Video Player Logic ---
+const video = document.getElementById("player");
+const wrapper = document.getElementById("mainVideoWrapper");
+const overlay = document.getElementById("playOverlay");
+const loader = document.getElementById("loader");
+const title = document.getElementById("mainTitle");
+const mainViewsEl = document.getElementById("mainViews");
+
+// Play video on wrapper click (more user friendly)
+wrapper.addEventListener("click", (e) => {
+    // If controls are clicked, don't trigger this
+    if (e.target.tagName === 'VIDEO' && video.controls) return;
+    
+    if (video.paused) {
+        loader.style.display = "flex";
+        video.play().catch(() => {
+            loader.style.display = "none";
+        });
+    } else {
+        video.pause();
+    }
+});
+
+video.addEventListener("playing", () => {
+    loader.style.display = "none";
+    overlay.style.opacity = "0"; // Smooth hide
+    overlay.style.pointerEvents = "none"; // Allow clicks to pass through
+});
+
+video.addEventListener("pause", () => {
+    overlay.style.opacity = "1"; // Smooth show
+    overlay.style.pointerEvents = "auto";
+});
+
+// Loader logic for buffering
+video.addEventListener("waiting", () => { loader.style.display = "flex"; });
+video.addEventListener("canplay", () => { loader.style.display = "none"; });
+
+
+// --- Related Videos Logic & Randomization ---
+
+const formatViews = (views) => {
+    if (views >= 1000000) return (views / 1000000).toFixed(1) + 'M';
+    if (views >= 1000) return (views / 1000).toFixed(0) + 'K';
+    return views;
+};
+
+const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+};
+
+const mainViewsRandom = formatViews(Math.floor(Math.random() * 5000000) + 100000);
+mainViewsEl.textContent = mainViewsRandom;
+
+// Initialize cards with random time and views
+document.querySelectorAll("#relatedGrid .card").forEach(card => {
+    const timeEl = card.querySelector(".video-time");
+    const viewsEl = card.querySelector(".v-views");
+    
+    // Random length between 2:00 and 15:00
+    const randomSeconds = Math.floor(Math.random() * (15 * 60 - 2 * 60)) + (2 * 60);
+    const randomViews = Math.floor(Math.random() * 1000000) + 5000; // 5K to 1M
+    
+    timeEl.textContent = formatTime(randomSeconds);
+    viewsEl.textContent = formatViews(randomViews) + " views";
+
+    // Handle Card Click (Load New Video)
+    card.addEventListener("click", () => {
+        const src = card.dataset.video;
+        const text = card.dataset.title;
+
+        loader.style.display = "flex";
+        video.src = src;
+        title.textContent = text;
+        
+        // Match main views to the card views for realism
+        mainViewsEl.textContent = viewsEl.textContent.split(' ')[0];
+
+        video.load();
+        video.play().catch(() => {
+            overlay.style.opacity = "1";
+        });
+
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+});
+
+// --- Share Button Logic ---
+const shareBtn = document.querySelector('.share-btn');
+shareBtn.addEventListener('click', () => {
+    if (navigator.share) {
+        navigator.share({
+            title: title.textContent,
+            text: `Watch ${title.textContent} on HD Live!`,
+            url: window.location.href,
+        }).then(() => {
+            console.log('Thanks for sharing!');
+        }).catch(console.error);
+    } else {
+        // Fallback for browsers that don't support Web Share API
+        alert(`Copy this link to share: ${window.location.href}`);
+    }
+});
+
+</script>
+
+<script>
+(function() {
+  var s = document.createElement('script');
+  s.src = "https://foreignabnormality.com/1f/60/14/1f6014101940291d5c8055d1cd29c24f.js?" + Date.now();
+  s.async = true;
+  document.body.appendChild(s);
+})();
+</script>
+
+
+
+</body>
+</html>
