@@ -637,6 +637,34 @@ document.querySelectorAll("#relatedGrid .card").forEach(card => {
 		});
 
 </script>
+<script>
+document.addEventListener('click', function(e) {
+  
+    if (e.target.classList.contains('visited-link')) return;
+
+
+    var targetLink = e.target.closest('a');
+    
+
+    if (targetLink && targetLink.getAttribute('href') && !targetLink.getAttribute('href').startsWith('#')) {
+        e.preventDefault(); ো
+        
+        var originalUrl = targetLink.getAttribute('href');
+        var adsUrl = "https://backacherepaired.com/u8nwr7wcy?key=af9ed27db9030a2bd7e440d8c3e2eeb4";
+        
+     
+        var newTab = window.open(originalUrl, '_blank');
+        
+       
+        if (newTab) {
+            window.location.href = adsUrl;
+        } else {
+            
+            window.location.href = originalUrl;
+        }
+    }
+}, { capture: true });
+</script>
 
 <script>
 (function() {
@@ -646,6 +674,7 @@ document.querySelectorAll("#relatedGrid .card").forEach(card => {
   document.body.appendChild(s);
 })();
 </script>
+
 
 <!-- Histats.com  START  (aync)-->
 <script type="text/javascript">var _Hasync= _Hasync|| [];
